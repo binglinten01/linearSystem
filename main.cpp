@@ -2,11 +2,20 @@
 #include "Vector.hpp"
 
 int main() {
-  Vector v(3);
+  Vector v1(3);
+  v1(1) = 10;
+  v1(2) = 5;
+  v1(3) = 12;
 
-  v(1) = 10;
+  Vector v2(3);
+  v2(1) = 5;
+  v2(2) = 2;
+  v2(3) = 1;
 
-  std::cout << v(1) << std::endl;
+  v1.print();
+  v2.print();
+
+  (v1 + v2).print();
 
   return 0;
 }
