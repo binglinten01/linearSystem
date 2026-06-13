@@ -1,5 +1,5 @@
+#include "Vector/Vector.hpp"
 #include <iostream>
-#include "Vector.hpp"
 
 int main() {
   Vector v1(3);
@@ -16,6 +16,10 @@ int main() {
   v2.print();
 
   (v1 + v2).print();
+  (v1 - v2).print();
+  (v1 * 2).print();
+
+  std::cout << v1 * v2 << std::endl;
 
   return 0;
 }
