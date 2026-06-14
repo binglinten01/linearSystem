@@ -1,25 +1,35 @@
+#include "Matrix/Matrix.hpp"
 #include "Vector/Vector.hpp"
 #include <iostream>
 
 int main() {
-  Vector v1(3);
-  v1(1) = 10;
-  v1(2) = 5;
-  v1(3) = 12;
+  Matrix A(2, 2);
 
-  Vector v2(3);
-  v2(1) = 5;
-  v2(2) = 2;
-  v2(3) = 1;
+  A(1, 1) = 1;
+  A(1, 2) = 2;
+  A(2, 1) = 3;
+  A(2, 2) = 4;
 
-  v1.print();
-  v2.print();
+  std::cout << "A:" << std::endl;
+  A.print();
 
-  (v1 + v2).print();
-  (v1 - v2).print();
-  (v1 * 2).print();
+  std::cout << "det(A): " << A.determinant() << std::endl;
 
-  std::cout << v1 * v2 << std::endl;
+  std::cout << "inverse(A):" << std::endl;
+  Matrix invA = A.inverse();
+  invA.print();
+
+  std::cout << "A * inverse(A):" << std::endl;
+  Matrix identity = A * invA;
+  identity.print();
+
+  Vector v(2);
+  v(1) = 5;
+  v(2) = 6;
+
+  std::cout << "A * v:" << std::endl;
+  Vector result = A * v;
+  result.print();
 
   return 0;
 }

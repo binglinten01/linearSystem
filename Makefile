@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17
 
-SRC = main.cpp Vector/Vector.cpp
+SRC = main.cpp Vector/Vector.cpp Matrix/Matrix.cpp
 OUT = main
 
 build:
