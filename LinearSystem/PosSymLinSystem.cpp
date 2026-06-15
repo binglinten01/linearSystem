@@ -6,43 +6,33 @@ PosSymLinSystem::PosSymLinSystem(const Matrix& A, const Vector& b)
     : LinearSystem(A, b) {
     for (int i = 1; i <= mSize; i++) {
         for (int j = 1; j <= mSize; j++) {
-            assert(std::fabs((*mpA)(i, j) - (*mpA)(j, i)) < 1e-10);
+            assert(std::fabs((*mpA)(i, j) - (*mpA)(j, i)) < 1e-5f);
         }
     }
 }
 
 Vector PosSymLinSystem::Solve() const {
     Vector x(mSize);
-    Vector r = (*mpb) - ((*mpA) * x);
-    Vector p = r;
+    Vector r(*mpb);
+    Vector p(r);
 
-    double rsOld = r * r;
+    float oldResidual = r * r;
 
-    if (std::sqrt(rsOld) < 1e-10) {
-        return x;
-    }
-
-    int maxIterations = mSize * 100;
-
-    for (int iter = 0; iter < maxIterations; iter++) {
+    for (int iteration = 0; iteration < 1000; iteration++) {
         Vector Ap = (*mpA) * p;
-        double denominator = p * Ap;
+        float alpha = oldResidual / (p * Ap);
 
-        assert(std::fabs(denominator) > 1e-14);
+        x = x + p * alpha;
+        r = r - Ap * alpha;
 
-        double alpha = rsOld / denominator;
+        float newResidual = r * r;
 
-        x += p * alpha;
-        r -= Ap * alpha;
-
-        double rsNew = r * r;
-
-        if (std::sqrt(rsNew) < 1e-10) {
+        if (std::sqrt(newResidual) < 1e-5f) {
             break;
         }
 
-        p = r + p * (rsNew / rsOld);
-        rsOld = rsNew;
+        p = r + p * (newResidual / oldResidual);
+        oldResidual = newResidual;
     }
 
     return x;

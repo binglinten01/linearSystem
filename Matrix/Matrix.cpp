@@ -10,13 +10,13 @@ Matrix::Matrix(int numRows, int numCols) {
     mNumRows = numRows;
     mNumCols = numCols;
 
-    mData = new double*[mNumRows];
+    mData = new float*[mNumRows];
 
     for (int i = 0; i < mNumRows; i++) {
-        mData[i] = new double[mNumCols];
+        mData[i] = new float[mNumCols];
 
         for (int j = 0; j < mNumCols; j++) {
-            mData[i][j] = 0.0;
+            mData[i][j] = 0.0f;
         }
     }
 }
@@ -25,10 +25,10 @@ Matrix::Matrix(const Matrix& other) {
     mNumRows = other.mNumRows;
     mNumCols = other.mNumCols;
 
-    mData = new double*[mNumRows];
+    mData = new float*[mNumRows];
 
     for (int i = 0; i < mNumRows; i++) {
-        mData[i] = new double[mNumCols];
+        mData[i] = new float[mNumCols];
 
         for (int j = 0; j < mNumCols; j++) {
             mData[i][j] = other.mData[i][j];
@@ -57,10 +57,10 @@ Matrix& Matrix::operator=(const Matrix& other) {
     mNumRows = other.mNumRows;
     mNumCols = other.mNumCols;
 
-    mData = new double*[mNumRows];
+    mData = new float*[mNumRows];
 
     for (int i = 0; i < mNumRows; i++) {
-        mData[i] = new double[mNumCols];
+        mData[i] = new float[mNumCols];
 
         for (int j = 0; j < mNumCols; j++) {
             mData[i][j] = other.mData[i][j];
@@ -78,14 +78,14 @@ int Matrix::getNumCols() const {
     return mNumCols;
 }
 
-double& Matrix::operator()(int i, int j) {
+float& Matrix::operator()(int i, int j) {
     assert(i >= 1 && i <= mNumRows);
     assert(j >= 1 && j <= mNumCols);
 
     return mData[i - 1][j - 1];
 }
 
-const double& Matrix::operator()(int i, int j) const {
+const float& Matrix::operator()(int i, int j) const {
     assert(i >= 1 && i <= mNumRows);
     assert(j >= 1 && j <= mNumCols);
 
@@ -153,7 +153,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
 
     for (int i = 0; i < mNumRows; i++) {
         for (int j = 0; j < other.mNumCols; j++) {
-            double sum = 0.0;
+            float sum = 0.0f;
 
             for (int k = 0; k < mNumCols; k++) {
                 sum += mData[i][k] * other.mData[k][j];
@@ -172,7 +172,7 @@ Vector Matrix::operator*(const Vector& v) const {
     Vector result(mNumRows);
 
     for (int i = 1; i <= mNumRows; i++) {
-        double sum = 0.0;
+        float sum = 0.0f;
 
         for (int j = 1; j <= mNumCols; j++) {
             sum += (*this)(i, j) * v(j);
@@ -184,7 +184,7 @@ Vector Matrix::operator*(const Vector& v) const {
     return result;
 }
 
-Matrix Matrix::operator+(double scalar) const {
+Matrix Matrix::operator+(float scalar) const {
     Matrix result(mNumRows, mNumCols);
 
     for (int i = 0; i < mNumRows; i++) {
@@ -196,7 +196,7 @@ Matrix Matrix::operator+(double scalar) const {
     return result;
 }
 
-Matrix Matrix::operator-(double scalar) const {
+Matrix Matrix::operator-(float scalar) const {
     Matrix result(mNumRows, mNumCols);
 
     for (int i = 0; i < mNumRows; i++) {
@@ -208,7 +208,7 @@ Matrix Matrix::operator-(double scalar) const {
     return result;
 }
 
-Matrix Matrix::operator*(double scalar) const {
+Matrix Matrix::operator*(float scalar) const {
     Matrix result(mNumRows, mNumCols);
 
     for (int i = 0; i < mNumRows; i++) {
@@ -220,133 +220,56 @@ Matrix Matrix::operator*(double scalar) const {
     return result;
 }
 
-Matrix Matrix::operator/(double scalar) const {
-    assert(std::fabs(scalar) > 1e-14);
-
-    Matrix result(mNumRows, mNumCols);
-
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            result.mData[i][j] = mData[i][j] / scalar;
-        }
-    }
-
-    return result;
-}
-
-Matrix& Matrix::operator+=(const Matrix& other) {
-    assert(mNumRows == other.mNumRows);
-    assert(mNumCols == other.mNumCols);
-
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            mData[i][j] += other.mData[i][j];
-        }
-    }
-
-    return *this;
-}
-
-Matrix& Matrix::operator-=(const Matrix& other) {
-    assert(mNumRows == other.mNumRows);
-    assert(mNumCols == other.mNumCols);
-
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            mData[i][j] -= other.mData[i][j];
-        }
-    }
-
-    return *this;
-}
-
-Matrix& Matrix::operator*=(double scalar) {
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            mData[i][j] *= scalar;
-        }
-    }
-
-    return *this;
-}
-
-Matrix& Matrix::operator/=(double scalar) {
-    assert(std::fabs(scalar) > 1e-14);
-
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            mData[i][j] /= scalar;
-        }
-    }
-
-    return *this;
-}
-
 Matrix Matrix::transpose() const {
     Matrix result(mNumCols, mNumRows);
 
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            result.mData[j][i] = mData[i][j];
+    for (int i = 1; i <= mNumRows; i++) {
+        for (int j = 1; j <= mNumCols; j++) {
+            result(j, i) = (*this)(i, j);
         }
     }
 
     return result;
 }
 
-Matrix Matrix::identity(int size) {
-    assert(size > 0);
-
-    Matrix result(size, size);
-
-    for (int i = 1; i <= size; i++) {
-        result(i, i) = 1.0;
-    }
-
-    return result;
-}
-
-double Matrix::determinant() const {
+float Matrix::determinant() const {
     assert(mNumRows == mNumCols);
 
-    int n = mNumRows;
     Matrix temp(*this);
-
-    double det = 1.0;
+    int n = mNumRows;
+    float det = 1.0f;
     int sign = 1;
 
-    for (int i = 0; i < n; i++) {
-        int pivotRow = i;
-        double maxValue = std::fabs(temp.mData[i][i]);
+    for (int k = 0; k < n; k++) {
+        int pivotRow = k;
+        float largest = std::fabs(temp.mData[k][k]);
 
-        for (int r = i + 1; r < n; r++) {
-            double value = std::fabs(temp.mData[r][i]);
-
-            if (value > maxValue) {
-                maxValue = value;
-                pivotRow = r;
+        for (int i = k + 1; i < n; i++) {
+            if (std::fabs(temp.mData[i][k]) > largest) {
+                largest = std::fabs(temp.mData[i][k]);
+                pivotRow = i;
             }
         }
 
-        if (maxValue < 1e-12) {
-            return 0.0;
+        if (largest < 1e-7f) {
+            return 0.0f;
         }
 
-        if (pivotRow != i) {
-            double* row = temp.mData[i];
-            temp.mData[i] = temp.mData[pivotRow];
+        if (pivotRow != k) {
+            float* row = temp.mData[k];
+            temp.mData[k] = temp.mData[pivotRow];
             temp.mData[pivotRow] = row;
-            sign *= -1;
+            sign = -sign;
         }
 
-        double pivot = temp.mData[i][i];
+        float pivot = temp.mData[k][k];
         det *= pivot;
 
-        for (int r = i + 1; r < n; r++) {
-            double factor = temp.mData[r][i] / pivot;
+        for (int i = k + 1; i < n; i++) {
+            float factor = temp.mData[i][k] / pivot;
 
-            for (int c = i; c < n; c++) {
-                temp.mData[r][c] -= factor * temp.mData[i][c];
+            for (int j = k; j < n; j++) {
+                temp.mData[i][j] -= factor * temp.mData[k][j];
             }
         }
     }
@@ -358,116 +281,78 @@ Matrix Matrix::inverse() const {
     assert(mNumRows == mNumCols);
 
     int n = mNumRows;
-    int width = 2 * n;
+    Matrix left(*this);
+    Matrix right(n, n);
 
-    double** augmented = new double*[n];
-
-    for (int i = 0; i < n; i++) {
-        augmented[i] = new double[width];
-
-        for (int j = 0; j < n; j++) {
-            augmented[i][j] = mData[i][j];
-        }
-
-        for (int j = n; j < width; j++) {
-            augmented[i][j] = 0.0;
-        }
-
-        augmented[i][n + i] = 1.0;
+    for (int i = 1; i <= n; i++) {
+        right(i, i) = 1.0f;
     }
 
-    for (int i = 0; i < n; i++) {
-        int pivotRow = i;
-        double maxValue = std::fabs(augmented[i][i]);
+    for (int k = 1; k <= n; k++) {
+        int pivotRow = k;
+        float largest = std::fabs(left(k, k));
 
-        for (int r = i + 1; r < n; r++) {
-            double value = std::fabs(augmented[r][i]);
-
-            if (value > maxValue) {
-                maxValue = value;
-                pivotRow = r;
+        for (int i = k + 1; i <= n; i++) {
+            if (std::fabs(left(i, k)) > largest) {
+                largest = std::fabs(left(i, k));
+                pivotRow = i;
             }
         }
 
-        assert(maxValue > 1e-12);
+        assert(largest > 1e-7f);
 
-        if (pivotRow != i) {
-            double* row = augmented[i];
-            augmented[i] = augmented[pivotRow];
-            augmented[pivotRow] = row;
+        if (pivotRow != k) {
+            for (int j = 1; j <= n; j++) {
+                float temp = left(k, j);
+                left(k, j) = left(pivotRow, j);
+                left(pivotRow, j) = temp;
+
+                temp = right(k, j);
+                right(k, j) = right(pivotRow, j);
+                right(pivotRow, j) = temp;
+            }
         }
 
-        double pivot = augmented[i][i];
+        float pivot = left(k, k);
 
-        for (int c = 0; c < width; c++) {
-            augmented[i][c] /= pivot;
+        for (int j = 1; j <= n; j++) {
+            left(k, j) = left(k, j) / pivot;
+            right(k, j) = right(k, j) / pivot;
         }
 
-        for (int r = 0; r < n; r++) {
-            if (r != i) {
-                double factor = augmented[r][i];
+        for (int i = 1; i <= n; i++) {
+            if (i != k) {
+                float factor = left(i, k);
 
-                for (int c = 0; c < width; c++) {
-                    augmented[r][c] -= factor * augmented[i][c];
+                for (int j = 1; j <= n; j++) {
+                    left(i, j) = left(i, j) - factor * left(k, j);
+                    right(i, j) = right(i, j) - factor * right(k, j);
                 }
             }
         }
     }
 
-    Matrix result(n, n);
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            result.mData[i][j] = augmented[i][j + n];
-        }
-    }
-
-    for (int i = 0; i < n; i++) {
-        delete[] augmented[i];
-    }
-    delete[] augmented;
-
-    return result;
+    return right;
 }
 
 Matrix Matrix::pseudoInverse() const {
     Matrix transposed = transpose();
 
     if (mNumRows >= mNumCols) {
-        Matrix normalLeft = transposed * (*this);
-        return normalLeft.inverse() * transposed;
+        Matrix normal = transposed * (*this);
+        return normal.inverse() * transposed;
     }
 
-    Matrix normalRight = (*this) * transposed;
-    return transposed * normalRight.inverse();
+    Matrix normal = (*this) * transposed;
+    return transposed * normal.inverse();
 }
 
 void Matrix::print() const {
-    for (int i = 0; i < mNumRows; i++) {
-        for (int j = 0; j < mNumCols; j++) {
-            std::cout << mData[i][j] << " ";
+    for (int i = 1; i <= mNumRows; i++) {
+        for (int j = 1; j <= mNumCols; j++) {
+            std::cout << (*this)(i, j) << " ";
         }
 
         std::cout << std::endl;
     }
-}
-
-Matrix operator+(double scalar, const Matrix& A) {
-    return A + scalar;
-}
-
-Matrix operator-(double scalar, const Matrix& A) {
-    Matrix result(A.mNumRows, A.mNumCols);
-
-    for (int i = 0; i < A.mNumRows; i++) {
-        for (int j = 0; j < A.mNumCols; j++) {
-            result.mData[i][j] = scalar - A.mData[i][j];
-        }
-    }
-
-    return result;
-}
-
-Matrix operator*(double scalar, const Matrix& A) {
-    return A * scalar;
 }

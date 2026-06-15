@@ -6,7 +6,7 @@
 class PosSymLinSystem : public LinearSystem {
 public:
     PosSymLinSystem(const Matrix& A, const Vector& b);
-    Vector Solve() const override;
+    Vector Solve() const;
 };
 
 #endif

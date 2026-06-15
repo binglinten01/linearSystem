@@ -4,7 +4,7 @@
 class Vector {
 private:
     int mSize;
-    double* mData;
+    float* mData;
 
 public:
     Vector(int size);
@@ -15,11 +15,11 @@ public:
 
     int getSize() const;
 
-    double& operator[](int index);
-    const double& operator[](int index) const;
+    float& operator[](int index);
+    const float& operator[](int index) const;
 
-    double& operator()(int index);
-    const double& operator()(int index) const;
+    float& operator()(int index);
+    const float& operator()(int index) const;
 
     Vector operator+() const;
     Vector operator-() const;
@@ -27,24 +27,13 @@ public:
     Vector operator+(const Vector& other) const;
     Vector operator-(const Vector& other) const;
 
-    Vector operator+(double scalar) const;
-    Vector operator-(double scalar) const;
-    Vector operator*(double scalar) const;
-    Vector operator/(double scalar) const;
+    Vector operator+(float scalar) const;
+    Vector operator-(float scalar) const;
+    Vector operator*(float scalar) const;
 
-    Vector& operator+=(const Vector& other);
-    Vector& operator-=(const Vector& other);
-    Vector& operator*=(double scalar);
-    Vector& operator/=(double scalar);
+    float operator*(const Vector& other) const;
 
-    double operator*(const Vector& other) const;
-
-    double norm() const;
     void print() const;
-
-    friend Vector operator+(double scalar, const Vector& v);
-    friend Vector operator-(double scalar, const Vector& v);
-    friend Vector operator*(double scalar, const Vector& v);
 };
 
 #endif

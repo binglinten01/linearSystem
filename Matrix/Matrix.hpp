@@ -7,7 +7,7 @@ class Matrix {
 private:
     int mNumRows;
     int mNumCols;
-    double** mData;
+    float** mData;
 
 public:
     Matrix(int numRows, int numCols);
@@ -19,8 +19,8 @@ public:
     int getNumRows() const;
     int getNumCols() const;
 
-    double& operator()(int i, int j);
-    const double& operator()(int i, int j) const;
+    float& operator()(int i, int j);
+    const float& operator()(int i, int j) const;
 
     Matrix operator+() const;
     Matrix operator-() const;
@@ -31,28 +31,16 @@ public:
 
     Vector operator*(const Vector& v) const;
 
-    Matrix operator+(double scalar) const;
-    Matrix operator-(double scalar) const;
-    Matrix operator*(double scalar) const;
-    Matrix operator/(double scalar) const;
-
-    Matrix& operator+=(const Matrix& other);
-    Matrix& operator-=(const Matrix& other);
-    Matrix& operator*=(double scalar);
-    Matrix& operator/=(double scalar);
+    Matrix operator+(float scalar) const;
+    Matrix operator-(float scalar) const;
+    Matrix operator*(float scalar) const;
 
     Matrix transpose() const;
-    static Matrix identity(int size);
-
-    double determinant() const;
+    float determinant() const;
     Matrix inverse() const;
     Matrix pseudoInverse() const;
 
     void print() const;
-
-    friend Matrix operator+(double scalar, const Matrix& A);
-    friend Matrix operator-(double scalar, const Matrix& A);
-    friend Matrix operator*(double scalar, const Matrix& A);
 };
 
 #endif

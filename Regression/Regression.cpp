@@ -1,99 +1,124 @@
 #include "Regression.hpp"
 #include "../Matrix/Matrix.hpp"
-#include "../LinearSystem/SolverHelpers.hpp"
-#include <cassert>
+#include "../Vector/Vector.hpp"
 #include <cmath>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
-struct CpuRecord {
-    double x[6];
-    double y;
-};
+const int MAX_ROWS = 300;
+const int NUM_FEATURES = 6;
 
-RegressionResult::RegressionResult(int parameterCount)
-    : parameters(parameterCount), rmse(0.0) {}
+bool readMachineData(const char* fileName, float features[MAX_ROWS][NUM_FEATURES], float targets[MAX_ROWS], int& numberOfRows) {
+    std::ifstream input(fileName);
 
-static bool parseCpuLine(const std::string& line, CpuRecord& record) {
-    std::stringstream ss(line);
-    std::string fields[10];
+    if (!input.is_open()) {
+        return false;
+    }
 
-    for (int i = 0; i < 10; i++) {
-        if (!std::getline(ss, fields[i], ',')) {
-            return false;
+    numberOfRows = 0;
+    std::string line;
+
+    while (std::getline(input, line) && numberOfRows < MAX_ROWS) {
+        std::stringstream lineStream(line);
+        std::string item;
+        std::string fields[10];
+        int fieldIndex = 0;
+
+        while (std::getline(lineStream, item, ',') && fieldIndex < 10) {
+            fields[fieldIndex] = item;
+            fieldIndex++;
+        }
+
+        if (fieldIndex == 10) {
+            features[numberOfRows][0] = std::stof(fields[2]);
+            features[numberOfRows][1] = std::stof(fields[3]);
+            features[numberOfRows][2] = std::stof(fields[4]);
+            features[numberOfRows][3] = std::stof(fields[5]);
+            features[numberOfRows][4] = std::stof(fields[6]);
+            features[numberOfRows][5] = std::stof(fields[7]);
+            targets[numberOfRows] = std::stof(fields[8]);
+
+            numberOfRows++;
         }
     }
 
-    record.x[0] = std::stod(fields[2]);
-    record.x[1] = std::stod(fields[3]);
-    record.x[2] = std::stod(fields[4]);
-    record.x[3] = std::stod(fields[5]);
-    record.x[4] = std::stod(fields[6]);
-    record.x[5] = std::stod(fields[7]);
-    record.y = std::stod(fields[8]);
-
+    input.close();
     return true;
 }
 
-RegressionResult runCpuRegression(const std::string& filename, double lambda) {
-    std::ifstream input(filename);
-    assert(input.is_open());
+Vector trainRegression(float features[MAX_ROWS][NUM_FEATURES], float targets[MAX_ROWS], int trainRows) {
+    Matrix X(trainRows, NUM_FEATURES);
+    Vector y(trainRows);
 
-    std::vector<CpuRecord> records;
-    std::string line;
-
-    while (std::getline(input, line)) {
-        if (line.empty()) {
-            continue;
+    for (int i = 1; i <= trainRows; i++) {
+        for (int j = 1; j <= NUM_FEATURES; j++) {
+            X(i, j) = features[i - 1][j - 1];
         }
 
-        CpuRecord record;
-
-        if (parseCpuLine(line, record)) {
-            records.push_back(record);
-        }
+        y(i) = targets[i - 1];
     }
 
-    assert(records.size() >= 2);
+    Matrix XInverse = X.pseudoInverse();
+    Vector parameters = XInverse * y;
 
-    int totalCount = static_cast<int>(records.size());
-    int trainingCount = static_cast<int>(totalCount * 0.8);
-    int testingCount = totalCount - trainingCount;
+    return parameters;
+}
 
-    assert(trainingCount > 0);
-    assert(testingCount > 0);
+float predict(const Vector& parameters, float row[NUM_FEATURES]) {
+    float prediction = 0.0f;
 
-    Matrix X(trainingCount, 6);
-    Vector y(trainingCount);
-
-    for (int i = 1; i <= trainingCount; i++) {
-        for (int j = 1; j <= 6; j++) {
-            X(i, j) = records[i - 1].x[j - 1];
-        }
-
-        y(i) = records[i - 1].y;
+    for (int i = 1; i <= NUM_FEATURES; i++) {
+        prediction += parameters(i) * row[i - 1];
     }
 
-    Vector parameters = solveByTikhonov(X, y, lambda);
+    return prediction;
+}
 
-    double squaredErrorSum = 0.0;
+float computeRMSE(const Vector& parameters, float features[MAX_ROWS][NUM_FEATURES], float targets[MAX_ROWS], int startRow, int endRow) {
+    float errorSum = 0.0f;
+    int count = 0;
 
-    for (int i = trainingCount; i < totalCount; i++) {
-        double prediction = 0.0;
-
-        for (int j = 0; j < 6; j++) {
-            prediction += parameters(j + 1) * records[i].x[j];
-        }
-
-        double error = prediction - records[i].y;
-        squaredErrorSum += error * error;
+    for (int i = startRow; i < endRow; i++) {
+        float predicted = predict(parameters, features[i]);
+        float error = predicted - targets[i];
+        errorSum += error * error;
+        count++;
     }
 
-    RegressionResult result(6);
-    result.parameters = parameters;
-    result.rmse = std::sqrt(squaredErrorSum / testingCount);
+    return std::sqrt(errorSum / count);
+}
 
-    return result;
+void runRegression(const char* fileName) {
+    float features[MAX_ROWS][NUM_FEATURES];
+    float targets[MAX_ROWS];
+    int numberOfRows = 0;
+
+    bool fileLoaded = readMachineData(fileName, features, targets, numberOfRows);
+
+    if (!fileLoaded) {
+        std::cout << "Regression data file was not found." << std::endl;
+        std::cout << "Download machine.data from the UCI Computer Hardware dataset." << std::endl;
+        std::cout << "Then put it in this folder and run: ./main machine.data" << std::endl;
+        return;
+    }
+
+    int trainRows = numberOfRows * 80 / 100;
+    int testRows = numberOfRows - trainRows;
+
+    Vector parameters = trainRegression(features, targets, trainRows);
+    float trainRMSE = computeRMSE(parameters, features, targets, 0, trainRows);
+    float testRMSE = computeRMSE(parameters, features, targets, trainRows, numberOfRows);
+
+    std::cout << "Linear regression test" << std::endl;
+    std::cout << "Rows: " << numberOfRows << std::endl;
+    std::cout << "Training rows: " << trainRows << std::endl;
+    std::cout << "Testing rows: " << testRows << std::endl;
+
+    std::cout << "Parameters:" << std::endl;
+    parameters.print();
+
+    std::cout << "Training RMSE: " << trainRMSE << std::endl;
+    std::cout << "Testing RMSE: " << testRMSE << std::endl;
 }

@@ -11,9 +11,30 @@ LinearSystem::LinearSystem(const Matrix& A, const Vector& b) {
     mpb = new Vector(b);
 }
 
+LinearSystem::LinearSystem(const LinearSystem& other) {
+    mSize = other.mSize;
+    mpA = new Matrix(*(other.mpA));
+    mpb = new Vector(*(other.mpb));
+}
+
 LinearSystem::~LinearSystem() {
     delete mpA;
     delete mpb;
+}
+
+LinearSystem& LinearSystem::operator=(const LinearSystem& other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    delete mpA;
+    delete mpb;
+
+    mSize = other.mSize;
+    mpA = new Matrix(*(other.mpA));
+    mpb = new Vector(*(other.mpb));
+
+    return *this;
 }
 
 Vector LinearSystem::Solve() const {
@@ -22,55 +43,50 @@ Vector LinearSystem::Solve() const {
 
     for (int k = 1; k <= mSize - 1; k++) {
         int pivotRow = k;
-        double maxValue = std::fabs(A(k, k));
+        float largest = std::fabs(A(k, k));
 
-        for (int r = k + 1; r <= mSize; r++) {
-            double value = std::fabs(A(r, k));
-
-            if (value > maxValue) {
-                maxValue = value;
-                pivotRow = r;
+        for (int i = k + 1; i <= mSize; i++) {
+            if (std::fabs(A(i, k)) > largest) {
+                largest = std::fabs(A(i, k));
+                pivotRow = i;
             }
         }
 
-        assert(maxValue > 1e-12);
+        assert(largest > 1e-7f);
 
         if (pivotRow != k) {
-            for (int c = k; c <= mSize; c++) {
-                double temp = A(k, c);
-                A(k, c) = A(pivotRow, c);
-                A(pivotRow, c) = temp;
+            for (int j = k; j <= mSize; j++) {
+                float temp = A(k, j);
+                A(k, j) = A(pivotRow, j);
+                A(pivotRow, j) = temp;
             }
 
-            double tempB = b(k);
+            float temp = b(k);
             b(k) = b(pivotRow);
-            b(pivotRow) = tempB;
+            b(pivotRow) = temp;
         }
 
-        for (int r = k + 1; r <= mSize; r++) {
-            double factor = A(r, k) / A(k, k);
-            A(r, k) = 0.0;
+        for (int i = k + 1; i <= mSize; i++) {
+            float factor = A(i, k) / A(k, k);
 
-            for (int c = k + 1; c <= mSize; c++) {
-                A(r, c) -= factor * A(k, c);
+            for (int j = k; j <= mSize; j++) {
+                A(i, j) = A(i, j) - factor * A(k, j);
             }
 
-            b(r) -= factor * b(k);
+            b(i) = b(i) - factor * b(k);
         }
     }
-
-    assert(std::fabs(A(mSize, mSize)) > 1e-12);
 
     Vector x(mSize);
 
     for (int i = mSize; i >= 1; i--) {
-        double sum = b(i);
+        float sum = b(i);
 
         for (int j = i + 1; j <= mSize; j++) {
-            sum -= A(i, j) * x(j);
+            sum = sum - A(i, j) * x(j);
         }
 
-        assert(std::fabs(A(i, i)) > 1e-12);
+        assert(std::fabs(A(i, i)) > 1e-7f);
         x(i) = sum / A(i, i);
     }
 

@@ -12,10 +12,10 @@ protected:
 
 public:
     LinearSystem(const Matrix& A, const Vector& b);
+    LinearSystem(const LinearSystem& other);
     virtual ~LinearSystem();
 
-    LinearSystem(const LinearSystem& other) = delete;
-    LinearSystem& operator=(const LinearSystem& other) = delete;
+    LinearSystem& operator=(const LinearSystem& other);
 
     virtual Vector Solve() const;
 };
