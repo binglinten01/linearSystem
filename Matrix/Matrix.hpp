@@ -5,46 +5,54 @@
 
 class Matrix {
 private:
-  int mNumRows;
-  int mNumCols;
-  float **mData;
+    int mNumRows;
+    int mNumCols;
+    double** mData;
 
 public:
-  Matrix(int numRows, int numCols);
-  Matrix(const Matrix &other);
-  ~Matrix();
+    Matrix(int numRows, int numCols);
+    Matrix(const Matrix& other);
+    ~Matrix();
 
-  Matrix &operator=(const Matrix &other);
+    Matrix& operator=(const Matrix& other);
 
-  int getNumRows() const;
-  int getNumCols() const;
+    int getNumRows() const;
+    int getNumCols() const;
 
-  float &operator()(int i, int j);
-  const float &operator()(int i, int j) const;
+    double& operator()(int i, int j);
+    const double& operator()(int i, int j) const;
 
-  Matrix operator+() const;
-  Matrix operator-() const;
+    Matrix operator+() const;
+    Matrix operator-() const;
 
-  Matrix operator+(const Matrix &other) const;
-  Matrix operator-(const Matrix &other) const;
-  Matrix operator*(const Matrix &other) const;
+    Matrix operator+(const Matrix& other) const;
+    Matrix operator-(const Matrix& other) const;
+    Matrix operator*(const Matrix& other) const;
 
-  Vector operator*(const Vector &v) const;
+    Vector operator*(const Vector& v) const;
 
-  Matrix operator+(float scalar) const;
-  Matrix operator-(float scalar) const;
-  Matrix operator*(float scalar) const;
+    Matrix operator+(double scalar) const;
+    Matrix operator-(double scalar) const;
+    Matrix operator*(double scalar) const;
+    Matrix operator/(double scalar) const;
 
-  Matrix transpose() const;
-  float determinant() const;
-  Matrix inverse() const;
-  Matrix pseudoInverse() const;
+    Matrix& operator+=(const Matrix& other);
+    Matrix& operator-=(const Matrix& other);
+    Matrix& operator*=(double scalar);
+    Matrix& operator/=(double scalar);
 
-  void print() const;
+    Matrix transpose() const;
+    static Matrix identity(int size);
 
-  friend Matrix operator+(float scalar, const Matrix &A);
-  friend Matrix operator-(float scalar, const Matrix &A);
-  friend Matrix operator*(float scalar, const Matrix &A);
+    double determinant() const;
+    Matrix inverse() const;
+    Matrix pseudoInverse() const;
+
+    void print() const;
+
+    friend Matrix operator+(double scalar, const Matrix& A);
+    friend Matrix operator-(double scalar, const Matrix& A);
+    friend Matrix operator*(double scalar, const Matrix& A);
 };
 
 #endif

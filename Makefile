@@ -1,7 +1,14 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17
 
-SRC = main.cpp Vector/Vector.cpp Matrix/Matrix.cpp
+SRC = main.cpp \
+      Vector/Vector.cpp \
+      Matrix/Matrix.cpp \
+      LinearSystem/LinearSystem.cpp \
+      LinearSystem/PosSymLinSystem.cpp \
+      LinearSystem/SolverHelpers.cpp \
+      Regression/Regression.cpp
+
 OUT = main
 
 build:

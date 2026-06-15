@@ -3,41 +3,48 @@
 
 class Vector {
 private:
-  int mSize;
-  float *mData;
+    int mSize;
+    double* mData;
 
 public:
-  Vector(int size);
-  Vector(const Vector &other);
-  ~Vector();
+    Vector(int size);
+    Vector(const Vector& other);
+    ~Vector();
 
-  Vector &operator=(const Vector &other);
+    Vector& operator=(const Vector& other);
 
-  int getSize() const;
+    int getSize() const;
 
-  float &operator[](int index);
-  const float &operator[](int index) const;
+    double& operator[](int index);
+    const double& operator[](int index) const;
 
-  float &operator()(int index);
-  const float &operator()(int index) const;
+    double& operator()(int index);
+    const double& operator()(int index) const;
 
-  Vector operator+() const;
-  Vector operator-() const;
+    Vector operator+() const;
+    Vector operator-() const;
 
-  Vector operator+(const Vector &other) const;
-  Vector operator-(const Vector &other) const;
+    Vector operator+(const Vector& other) const;
+    Vector operator-(const Vector& other) const;
 
-  Vector operator+(float scalar) const;
-  Vector operator-(float scalar) const;
-  Vector operator*(float scalar) const;
+    Vector operator+(double scalar) const;
+    Vector operator-(double scalar) const;
+    Vector operator*(double scalar) const;
+    Vector operator/(double scalar) const;
 
-  float operator*(const Vector &other) const;
+    Vector& operator+=(const Vector& other);
+    Vector& operator-=(const Vector& other);
+    Vector& operator*=(double scalar);
+    Vector& operator/=(double scalar);
 
-  void print() const;
+    double operator*(const Vector& other) const;
 
-  friend Vector operator+(float scalar, const Vector &v);
-  friend Vector operator-(float scalar, const Vector &v);
-  friend Vector operator*(float scalar, const Vector &v);
+    double norm() const;
+    void print() const;
+
+    friend Vector operator+(double scalar, const Vector& v);
+    friend Vector operator-(double scalar, const Vector& v);
+    friend Vector operator*(double scalar, const Vector& v);
 };
 
 #endif
